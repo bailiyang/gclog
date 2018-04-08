@@ -17,21 +17,27 @@ import (
 )
 
 const (
-	verbLog int = iota
-	debugLog
-	infoLog
-	noticeLog
-	warningLog
-	errorLog = 5
+	//VerbLevel verb
+	VerbLevel int = iota
+	//DebugLevel debug
+	DebugLevel
+	//InfoLevel info
+	InfoLevel
+	//NoticeLevel notice
+	NoticeLevel
+	//WarningLevel warning
+	WarningLevel
+	//ErrorLevel error
+	ErrorLevel = 5
 )
 
 var headName = []string{
-	verbLog:    "[VERB] ",
-	debugLog:   "[DEBUG] ",
-	infoLog:    "[INFO] ",
-	noticeLog:  "[NOTICE] ",
-	warningLog: "[WARNING] ",
-	errorLog:   "[ERROR] ",
+	VerbLevel:    "[VERB] ",
+	DebugLevel:   "[DEBUG] ",
+	InfoLevel:    "[INFO] ",
+	NoticeLevel:  "[NOTICE] ",
+	WarningLevel: "[WARNING] ",
+	ErrorLevel:   "[ERROR] ",
 }
 
 var (
@@ -49,7 +55,7 @@ var (
 
 func init() {
 	writeToFile = false                 //默认不输出到文件
-	logLevel = noticeLog                //默认notice级别
+	logLevel = NoticeLevel              //默认notice级别
 	logStorageTime = 7 * 24 * time.Hour //日志文件默认保存7日
 	levelLock = new(sync.Mutex)
 	fileLock = new(sync.Mutex)
@@ -238,7 +244,7 @@ func signalListen() {
 func LogLevelUp() {
 	levelLock.Lock()
 	defer levelLock.Unlock()
-	if logLevel >= verbLog && logLevel < errorLog {
+	if logLevel >= VerbLevel && logLevel < ErrorLevel {
 		logLevel++
 		Warning("log level up")
 	}
@@ -248,7 +254,7 @@ func LogLevelUp() {
 func LogLevelDown() {
 	levelLock.Lock()
 	defer levelLock.Unlock()
-	if logLevel >= verbLog && logLevel < errorLog {
+	if logLevel >= VerbLevel && logLevel < ErrorLevel {
 		logLevel--
 		Warning("log level down")
 	}
@@ -258,50 +264,57 @@ func LogLevelDown() {
 func SetLogLevel(level int) {
 	levelLock.Lock()
 	defer levelLock.Unlock()
-	if level >= verbLog && level < errorLog {
+	if level >= VerbLevel && level < ErrorLevel {
 		logLevel = level
 	}
 }
 
 //Verb 输出verb日志
 func Verb(msg string, v ...interface{}) {
-	if logLevel >= verbLog {
-		writeLog(headName[verbLog], fmt.Sprintf(msg, v...))
+	if logLevel <= VerbLevel {
+		writeLog(headName[VerbLevel], fmt.Sprintf(msg, v...))
+	}
+}
+
+//Debugln 输出debug的日志，自带换行符
+func Debugln(v ...interface{}) {
+	if logLevel >= DebugLevel {
+		writeLog(headName[DebugLevel], fmt.Sprintln(v...))
 	}
 }
 
 //Debug 输出debug日志
 func Debug(msg string, v ...interface{}) {
-	if logLevel >= debugLog {
-		writeLog(headName[debugLog], fmt.Sprintf(msg, v...))
+	if logLevel <= DebugLevel {
+		writeLog(headName[DebugLevel], fmt.Sprintf(msg, v...))
 	}
 }
 
 //Info 输出info日志
 func Info(msg string, v ...interface{}) {
-	if logLevel >= infoLog {
-		writeLog(headName[infoLog], fmt.Sprintf(msg, v...))
+	if logLevel <= InfoLevel {
+		writeLog(headName[InfoLevel], fmt.Sprintf(msg, v...))
 	}
 }
 
 //Notice 输出notice日志
 func Notice(msg string, v ...interface{}) {
-	if logLevel >= noticeLog {
-		writeLog(headName[noticeLog], fmt.Sprintf(msg, v...))
+	if logLevel <= NoticeLevel {
+		writeLog(headName[NoticeLevel], fmt.Sprintf(msg, v...))
 	}
 }
 
 //Warning 输出warning日志
 func Warning(msg string, v ...interface{}) {
-	if logLevel >= warningLog {
-		writeLog(headName[warningLog], fmt.Sprintf(msg, v...))
+	if logLevel <= WarningLevel {
+		writeLog(headName[WarningLevel], fmt.Sprintf(msg, v...))
 	}
 }
 
 //Error 输出error日志
 func Error(msg string, v ...interface{}) {
-	if logLevel >= errorLog {
-		writeLog(headName[errorLog], fmt.Sprintf(msg, v...))
+	if logLevel <= ErrorLevel {
+		writeLog(headName[ErrorLevel], fmt.Sprintf(msg, v...))
 	}
 }
 
